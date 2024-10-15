@@ -1,5 +1,22 @@
+## Demo
+<div style="display: flex; align-items: top;">
+    <div>
+        <center><b>ใช้ MQTT</b></center>
+        <img src="screen1.png" alt="รูปตัวอย่าง ใช้ MQTT" width="auto">
+    </div>
+    <div style="border-left: 1px solid black; margin: 0 20px;"></div>
+    <div>
+        <center><b>ไม่ใช้ MQTT</b></center>
+        <img src="screen2.png" alt="รูปตัวอย่าง ไม่ใช้ MQTT" width="auto">
+    </div>
+</div>
+
+## การใช้งาน .exe
+- เข้าไปใน /dist
+- กำหนด ค่า `config.json` และเปิดใช้ `SpoShowIP.exe`
+
 ## Papar Information
-- Title:  `SPI ShowIP`
+- Title:  `SpoShowIP`
 - Authors:  `SPO DEV`
 
 ## Install & Dependence
@@ -34,14 +51,12 @@
 |    |—— system_info.py
 |    |—— __init__.py
 ```
-## License
+## Build .exe
 ```
 pyinstaller --onefile --noconsole --name SpoShowIP --add-data "img/logo_MOPH.png;img" --add-data "config.json;." main.py
 ```
 
 ## License
-- SPO MOPH
-
-
 ```
+[FREE] SPO-MOPH
 ```

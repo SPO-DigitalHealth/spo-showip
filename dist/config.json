@@ -1,5 +1,5 @@
 {
-    "use_mqtt" : true,
+    "use_mqtt" : false,
     "mqtt_host": "192.168.9.222",
     "mqtt_port": 1883,
     "mqtt_user": "spo",
