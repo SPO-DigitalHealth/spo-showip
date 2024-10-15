@@ -1,0 +1,12 @@
+{
+    "use_mqtt" : false,
+    "mqtt_host": "192.168.9.222",
+    "mqtt_port": 1883,
+    "mqtt_user": "spo",
+    "mqtt_pass": "@Ssj!",
+    "mqtt_client_prefix": "spo_client_",
+    "mqtt_topic_prefix": "/spo-client/windown/online",
+    "mqtt_update_interval_sec": 5000,
+    "tel_label":"โทรภายใน : 1011",
+    "developer_info_label":"กลุ่มงานสุขภาพดิจิทัล"
+}
