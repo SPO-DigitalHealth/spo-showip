@@ -9,7 +9,7 @@ import src.config as config  # Import global config
 
 if __name__ == "__main__":
     # ดึงข้อมูลจาก config.py
-    use_mqtt = config.config.get('use_mqtt', True)  # ค่า default คือ True
+    use_mqtt = config.config.get('use_mqtt', False)  # ค่า default คือ True
     mqtt_host = config.config.get('mqtt_host', 'localhost')
     mqtt_port = config.config.get('mqtt_port', 1883)
     mqtt_user = config.config.get('mqtt_user', '')

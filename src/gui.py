@@ -7,7 +7,8 @@ import json
 
 class ShowIPApp:
     def __init__(self, app, mqtt_client, topic, update_interval_sec):
-        self.use_mqtt = config.config.get('use_mqtt', True)
+        self.window_width = config.config.get('window_width', 300)
+        self.use_mqtt = config.config.get('use_mqtt', False)
         self.tel_label = config.config.get('tel_label', "โทรภายใน : 101")
         self.developer_info_label = config.config.get(
             'developer_info_label', "โทรภายใน : 101")
@@ -23,7 +24,7 @@ class ShowIPApp:
         self.app.overrideredirect(True)
         self.app.attributes('-topmost', False)
 
-        window_width = 300
+        window_width = self.window_width
         window_height = 140 if self.use_mqtt else 120
         screen_width = self.app.winfo_screenwidth()
         screen_height = self.app.winfo_screenheight()
@@ -55,7 +56,7 @@ class ShowIPApp:
         text_frame.pack(side=tk.LEFT)
 
         self.hostname_label = tk.Label(
-            text_frame, text="", font=("Arial", 14), bd=0)
+            text_frame, text="", font=("Arial", 12), bd=0)
         self.hostname_label.pack(anchor="w", pady=(5, 0))
 
         self.ip_label = tk.Label(text_frame, font=("Arial", 18, "bold"), bd=0)
