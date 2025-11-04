@@ -1,3 +1,4 @@
+# gui.py
 import tkinter as tk
 from PIL import Image, ImageTk
 import src.config as config
@@ -7,11 +8,11 @@ import json
 
 class ShowIPApp:
     def __init__(self, app, mqtt_client, topic, update_interval_sec):
-        self.window_width = config.config.get('window_width', 300)
+        self.window_width = config.config.get('window_width', 330)
         self.use_mqtt = config.config.get('use_mqtt', False)
         self.tel_label = config.config.get('tel_label', "โทรภายใน : 101")
         self.developer_info_label = config.config.get(
-            'developer_info_label', "โทรภายใน : 101")
+            'developer_info_label', "โดยกลุ่มงานสุขภาพดิจิทัล")
 
         self.app = app
         self.mqtt_client = mqtt_client
