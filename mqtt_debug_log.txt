@@ -1,0 +1,23 @@
+[2025-11-04 16:37:29] ========== MQTT Client Debug Start ==========
+[2025-11-04 16:37:29] Broker: 192.168.1.9:1883, SSL: False
+[2025-11-04 16:37:29] Client ID: spo_client_-801
+[2025-11-04 16:37:29] Username (first 40 chars): eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ
+[2025-11-04 16:37:29] 🚀 Connecting to 192.168.1.9:1883 (SSL=False) ...
+[2025-11-04 16:37:34] ❌ Exception while connecting: timed out
+Traceback (most recent call last):
+  File "D:\DEV\SSJ\python\spo-showip\src\mqtt_client.py", line 87, in connect
+    self.client.connect(self.broker, self.port, keepalive=60)
+  File "C:\Users\DPlan-NA\AppData\Local\Programs\Python\Python312\Lib\site-packages\paho\mqtt\client.py", line 914, in connect
+    return self.reconnect()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\DPlan-NA\AppData\Local\Programs\Python\Python312\Lib\site-packages\paho\mqtt\client.py", line 1044, in reconnect
+    sock = self._create_socket_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DPlan-NA\AppData\Local\Programs\Python\Python312\Lib\site-packages\paho\mqtt\client.py", line 3685, in _create_socket_connection
+    return socket.create_connection(addr, timeout=self._connect_timeout, source_address=source)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DPlan-NA\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 852, in create_connection
+    raise exceptions[0]
+  File "C:\Users\DPlan-NA\AppData\Local\Programs\Python\Python312\Lib\socket.py", line 837, in create_connection
+    sock.connect(sa)
+TimeoutError: timed out

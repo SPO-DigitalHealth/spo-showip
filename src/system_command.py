@@ -1,94 +1,99 @@
 # src/system_command.py
 import psutil
 import platform
-import subprocess
 import os
-import base64
+import pathlib
+import subprocess
 import json
-import io
-from PIL import ImageGrab  # สำหรับ screenshot
+from datetime import datetime
 
 
 def get_status():
-    return {
-        "cpu_percent": psutil.cpu_percent(interval=1),
-        "ram_percent": psutil.virtual_memory().percent,
-        "disk_percent": psutil.disk_usage("/").percent,
-        "os": platform.system(),
-        "release": platform.release(),
-        "hostname": platform.node(),
-    }
+    """ดึงสถานะระบบพื้นฐาน"""
+    try:
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "hostname": platform.node(),
+            "os": platform.system(),
+            "release": platform.release(),
+            "cpu_percent": psutil.cpu_percent(interval=1),
+            "ram_percent": psutil.virtual_memory().percent,
+            "disk_percent": psutil.disk_usage('/').percent if os.name != 'nt' else psutil.disk_usage('C:\\').percent,
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def get_process_list(limit=10):
-    procs = []
+    """ดึงรายชื่อโปรเซสที่ใช้ CPU สูงสุด"""
+    processes = []
     for p in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
         try:
-            procs.append(p.info)
+            processes.append(p.info)
         except Exception:
             pass
-    return sorted(procs, key=lambda x: x['cpu_percent'], reverse=True)[:limit]
+    processes = sorted(processes, key=lambda x: x.get(
+        'cpu_percent', 0), reverse=True)
+    return processes[:limit]
 
 
-def execute_command(cmd):
+def list_files(path='.'):
+    """แสดงรายชื่อไฟล์ในโฟลเดอร์ (safe mode)"""
     try:
-        output = subprocess.check_output(cmd, shell=True, text=True)
-        return {"output": output.strip()}
-    except subprocess.CalledProcessError as e:
-        return {"error": str(e)}
+        p = pathlib.Path(path)
+        if not p.exists():
+            return {"error": "path not found", "path": path}
 
-
-def screenshot():
-    try:
-        img = ImageGrab.grab()
-        buf = io.BytesIO()
-        img.save(buf, format="PNG")
-        b64 = base64.b64encode(buf.getvalue()).decode()
-        return {"image_base64": b64}
+        files = []
+        for item in p.iterdir():
+            try:
+                files.append({
+                    "name": item.name,
+                    "is_dir": item.is_dir(),
+                    "size": item.stat().st_size,
+                    "modified": datetime.fromtimestamp(item.stat().st_mtime).isoformat()
+                })
+            except Exception:
+                pass
+        return {"path": str(p.resolve()), "files": files}
     except Exception as e:
         return {"error": str(e)}
 
 
-def list_files(path="."):
+def safe_exec(cmd: str):
+    """รันคำสั่งจาก whitelist เท่านั้น"""
+    WHITELIST = {
+        "whoami": "whoami",
+        "ipconfig": "ipconfig" if os.name == "nt" else "ifconfig",
+        "hostname": "hostname",
+        "uptime": "uptime"
+    }
+
+    if cmd not in WHITELIST:
+        return {"error": f"Command '{cmd}' not allowed"}
+
     try:
-        files = os.listdir(path)
-        return {"path": path, "files": files}
+        output = subprocess.check_output(
+            WHITELIST[cmd], shell=True, text=True, stderr=subprocess.STDOUT)
+        return {"command": cmd, "output": output.strip()}
     except Exception as e:
         return {"error": str(e)}
 
 
-def delete_file(path):
+def download_only(url: str):
+    """ดาวน์โหลดไฟล์จาก URL (ไม่ติดตั้ง / ไม่ execute)"""
+    import tempfile
+    import requests
     try:
-        os.remove(path)
-        return {"deleted": path}
-    except Exception as e:
-        return {"error": str(e)}
-
-
-def open_app(path):
-    try:
-        subprocess.Popen(path, shell=True)
-        return {"opened": path}
-    except Exception as e:
-        return {"error": str(e)}
-
-
-def shutdown():
-    os.system("shutdown /s /t 1" if platform.system()
-              == "Windows" else "shutdown now")
-    return {"status": "shutting down"}
-
-
-def reboot():
-    os.system("shutdown /r /t 1" if platform.system()
-              == "Windows" else "reboot")
-    return {"status": "rebooting"}
-
-
-def run_custom_script(code):
-    try:
-        exec_globals = {}
-        exec(code, exec_globals)
-        return {"result": exec_globals}
+        tmp_path = tempfile.gettempdir()
+        filename = os.path.basename(url.split("?")[0])
+        dest = os.path.join(tmp_path, filename)
+        r = requests.get(url, timeout=15, stream=True)
+        r.raise_for_status()
+        with open(dest, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+        return {"downloaded": dest}
     except Exception as e:
         return {"error": str(e)}
