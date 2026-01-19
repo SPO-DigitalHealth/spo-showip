@@ -1,10 +1,10 @@
 {
     "window_width":300,
     "use_mqtt" : false,
-    "mqtt_host": "192.168.0.1",
+    "mqtt_host": "192.168.90.201",
     "mqtt_port": 1883,
-    "mqtt_user": "mqtt_user",
-    "mqtt_pass": "mqtt_pass",
+    "mqtt_user": "",
+    "mqtt_pass": "",
     "mqtt_client_prefix": "spo_client_",
     "mqtt_topic_prefix": "/client/windown/online",
     "mqtt_update_interval_sec": 5000,

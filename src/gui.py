@@ -18,6 +18,8 @@ class ShowIPApp:
         self.mqtt_client = mqtt_client
         self.topic_prefix = topic
         self.update_interval_sec = update_interval_sec
+        self.text_frame = None  # Will store reference to text_frame
+        self.status_label = None  # Will store reference to status_label
         self.setup_gui()
 
     def setup_gui(self):
@@ -55,6 +57,7 @@ class ShowIPApp:
         # ข้อความ
         text_frame = tk.Frame(main_frame)
         text_frame.pack(side=tk.LEFT)
+        self.text_frame = text_frame  # Store reference
 
         self.hostname_label = tk.Label(
             text_frame, text="", font=("Arial", 12), bd=0)
@@ -93,6 +96,8 @@ class ShowIPApp:
         self.app.after(self.update_interval_sec, self.update_info)
 
     def send_mqtt(self, hostname, ip_address):
+        if self.mqtt_client is None:
+            return
         payload = json.dumps({"hostname": hostname, "ip": ip_address})
         # print(self.use_mqtt)
         # try:
@@ -104,4 +109,15 @@ class ShowIPApp:
 
     def update_status(self, message, color="black"):
         if self.use_mqtt:
-            self.status_label.config(text=message, fg=color)
+            # สร้าง status_label ถ้ายังไม่มี
+            if self.status_label is None and self.text_frame is not None:
+                print(f"Creating status_label with message: {message}")
+                self.status_label = tk.Label(
+                    self.text_frame, text="", font=("Arial", 8), bd=0)
+                self.status_label.pack(anchor="w", pady=(2, 0))
+            
+            if self.status_label is not None:
+                print(f"Updating status_label: {message} ({color})")
+                self.status_label.config(text=message, fg=color)
+            else:
+                print(f"⚠️ Cannot update status - status_label or text_frame is None")

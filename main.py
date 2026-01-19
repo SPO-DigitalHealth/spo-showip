@@ -6,6 +6,7 @@ from tkinter import messagebox
 from src.mqtt_client import MQTTClient
 from src.gui import ShowIPApp
 from src.config import fetch_config_from_api
+# from src.system_command import get_status
 import socket
 
 # ------------------------
@@ -15,7 +16,7 @@ import socket
 
 def run_agent():
     hostname = socket.gethostname()
-    api_url = "http://127.0.0.1:8000"  # ✅ เปลี่ยนเป็น URL Laravel Center ของคุณ
+    api_url = "http://192.168.90.201/spo-showip-laravel/public/index.php"  # ✅ เปลี่ยนเป็น URL Laravel Center ของคุณ
     api_config_url = f"{api_url}/api/config/mqtt?client={hostname}"
 
     cfg = fetch_config_from_api(api_config_url)
@@ -35,17 +36,33 @@ def run_agent():
         topic_prefix = cfg.get("mqtt_topic_prefix",
                                "/spo-client/windown/online")
         update_interval_sec = cfg.get("mqtt_update_interval_sec", 2000)
+        callback_url = cfg.get("url_callback")
+        
+        # ตรวจสอบว่า mqtt_user มีค่า
+        if not mqtt_user or mqtt_user.strip() == "":
+            print("⚠️ MQTT user is empty, cannot connect")
+            return
 
         mqtt_client = MQTTClient(mqtt_host, mqtt_port,
-                                 client_prefix, mqtt_user, mqtt_pass)
+                                 client_prefix, mqtt_user, mqtt_pass, callback_url=callback_url)
         show_ip_app.mqtt_client = mqtt_client
         show_ip_app.topic_prefix = topic_prefix
         show_ip_app.update_interval_sec = update_interval_sec
 
         try:
             mqtt_client.connect()
-            show_ip_app.update_status("Connected to MQTT", "green")
+            
+            # Subscribe ไปยัง topic สำหรับรับคำสั่ง
+            command_topic = topic_prefix.replace("/online", "/command")
+            mqtt_client.subscribe(command_topic)
+            # ให้เวลา subscription ทำงาน
+            time.sleep(0.5)
+            show_ip_app.use_mqtt = True
+            print("✅ MQTT Connected successfully")
+            show_ip_app.update_status("MQTT connected", "green")
         except Exception as e:
+            print(f"❌ Error in connect_mqtt: {e}")
+            show_ip_app.use_mqtt = True
             show_ip_app.update_status("MQTT connection failed", "red")
             messagebox.showerror("MQTT connection failed", str(e))
 
@@ -84,8 +101,7 @@ def run_agent():
     # เริ่มทำงานตามค่า config เริ่มต้น
     if cfg.get("use_mqtt", False):
         connect_mqtt()
-    else:
-        show_ip_app.update_status("Waiting for MQTT enable...", "orange")
+    # ถ้า use_mqtt เป็น False ไม่ต้องทำอะไร
 
     # สร้าง thread สำหรับอัปเดต config ทุก 1 นาที
     t = threading.Thread(target=refresh_config_loop, daemon=True)

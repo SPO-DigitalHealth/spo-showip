@@ -5,23 +5,34 @@ import os
 import pathlib
 import subprocess
 import json
+import shutil
 from datetime import datetime
 
 
 def get_status():
-    """ดึงสถานะระบบพื้นฐาน"""
+    """Get system status information"""
     try:
-        return {
+        result = {
             "timestamp": datetime.now().isoformat(),
             "hostname": platform.node(),
             "os": platform.system(),
             "release": platform.release(),
             "cpu_percent": psutil.cpu_percent(interval=1),
             "ram_percent": psutil.virtual_memory().percent,
-            "disk_percent": psutil.disk_usage('/').percent if os.name != 'nt' else psutil.disk_usage('C:\\').percent,
         }
+        
+        try:
+            cwd = os.path.abspath(os.getcwd())
+            disk_info = shutil.disk_usage(cwd)
+            disk_percent = (disk_info.used / disk_info.total) * 100
+            result["disk_percent"] = round(disk_percent, 2)
+        except Exception:
+            result["disk_percent"] = None
+        
+        return result
     except Exception as e:
-        return {"error": str(e)}
+        import traceback
+        return {"error": str(e), "traceback": traceback.format_exc()}
 
 
 def get_process_list(limit=10):

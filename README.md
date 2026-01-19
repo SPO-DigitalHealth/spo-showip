@@ -24,6 +24,11 @@
 - tkinter
 - paho.mqtt
 
+## Run DEV รันไฟล์ main.py
+```
+python main.py
+```
+
 ## Directory Hierarchy
 ```
 |—— config.json

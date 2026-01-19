@@ -12,7 +12,8 @@ def fetch_config_from_api(url):
             if response.status == 200:
                 data = json.loads(response.read().decode("utf-8"))
                 return data.get("data", data)
-    except Exception:
+    except Exception as e:
+        print("Error fetching config from API:", e)
         return {}
 
 
