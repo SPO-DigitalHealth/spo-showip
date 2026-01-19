@@ -1,7 +1,8 @@
 [Setup]
 AppName=SpoShowIP
 AppVersion=1.0.1
-AppId={{12345678-1234-1234-1234-123456789012}
+AppPublisher=Suphanburi Provincial Public Health Office
+AppPublisherURL=https://spo.moph.go.th
 DefaultDirName={pf}\SpoShowIP
 DefaultGroupName=SpoShowIP
 OutputDir=.\dist
@@ -17,6 +18,12 @@ CloseApplications=yes
 Source: "dist\SpoShowIP.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "config.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "img\*"; DestDir: "{app}\img"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Registry]
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "SpoShowIP"; ValueData: "{app}\SpoShowIP.exe"; Flags: uninsdeletevalue
+
+[Tasks]
+Name: "startup"; Description: "&Run SpoShowIP at startup"; GroupDescription: "Startup Options:"
 
 [Icons]
 Name: "{group}\SpoShowIP"; Filename: "{app}\SpoShowIP.exe"

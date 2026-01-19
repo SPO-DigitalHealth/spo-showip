@@ -9,6 +9,6 @@
     "mqtt_client_prefix": "spo_client_",
     "mqtt_topic_prefix": "spo-client/windown/online",
     "mqtt_update_interval_sec": 5000,
-    "tel_label":"โทรภายใน : 1011",
+    "tel_label":"โทรภายใน : 141",
     "developer_info_label":"กลุ่มงานสุขภาพดิจิทัล"
 }
