@@ -5,6 +5,7 @@ import traceback
 import json
 import threading
 import requests
+import os
 from datetime import datetime
 from paho.mqtt import client as mqtt_client
 from src.system_command import get_status
@@ -13,6 +14,22 @@ from src.system_command import get_status
 class MQTTClient:
     def __init__(self, broker, port, client_prefix=None, username=None, password=None,
                  use_ssl=False, ca_cert=None, log_file="mqtt_debug_log.txt", callback_url=None):
+        # ✅ สร้างโฟลเดอร์ logs ในตำแหน่งที่มี write permission
+        # ใช้ AppData ถ้าจำเป็น (เมื่อติดตั้ง)
+        if "Program Files" in os.getcwd() or "Program Files (x86)" in os.getcwd():
+            # ติดตั้งแล้ว - ใช้ AppData
+            log_dir = os.path.join(os.getenv('APPDATA'), 'SpoShowIP', 'logs')
+        else:
+            # ยังเป็น dev environment - ใช้ logs ที่ repo
+            log_dir = "logs"
+        
+        os.makedirs(log_dir, exist_ok=True)
+        
+        # ✅ ถ้าไม่ระบุ log_file ให้ใช้ default พร้อม timestamp
+        if log_file == "mqtt_debug_log.txt":
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            log_file = os.path.join(log_dir, f"mqtt_debug_{timestamp}.txt")
+        
         self.client_id = f'{client_prefix}-{random.randint(0, 1000)}'
         self.broker = broker
         self.port = port
@@ -42,7 +59,7 @@ class MQTTClient:
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
         self.client.on_message = self.on_message
-        self.client.on_log = self.on_log
+        # self.client.on_log = self.on_log
 
         # ✅ ถ้าใช้ SSL
         if self.use_ssl:
@@ -191,12 +208,14 @@ class MQTTClient:
             result = self.client.publish(topic, message)
             status = result[0]
             if status == 0:
-                self.log(f"✅ Message sent successfully to `{topic}`")
+                # self.log(f"✅ Message sent successfully to `{topic}`")
+                print(f"✅ Message sent successfully to `{topic}`")
             else:
-                self.log(
-                    f"❌ Failed to send message (status={status}) to `{topic}`")
+                # self.log(f"❌ Failed to send message (status={status}) to `{topic}`")
+                print(f"❌ Failed to send message (status={status}) to `{topic}`")
         except Exception as e:
-            self.log(f"⚠️ Error publishing: {e}")
+            # self.log(f"⚠️ Error publishing: {e}")
+            print(f"⚠️ Error publishing: {e}")
             traceback.print_exc()
             with open(self.log_file, "a", encoding="utf-8") as f:
                 traceback.print_exc(file=f)

@@ -61,6 +61,21 @@ python main.py
 pyinstaller --onefile --noconsole --name SpoShowIP --add-data "img/logo_MOPH.png;img" --add-data "config.json;." main.py
 ```
 
+
+## การสร้าง Setup.exe ติดตั้ง Inno Setup
+
+1.สร้างไฟล์ setup.iss
+
+2.รันคำสั่ง: (# Build .exe ก่อน)
+```
+pyinstaller --onefile --noconsole --name SpoShowIP --add-data "img/logo_MOPH.png;img" --add-data "config.json;." main.py
+```
+3.รันคำสั่ง:
+```
+กดเปิดไฟล์ setup.iss แล้วกด Compile
+```
+
+
 ## License
 ```
 [FREE] SPO-MOPH
